@@ -1,8 +1,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
+from google.cloud import dialogflow
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QVBoxLayout, QLabel,
-                             QMainWindow, QGridLayout, QHBoxLayout, QSpinBox, QMessageBox)
+                             QMainWindow, QGridLayout, QSpinBox, QMessageBox)
 import sys
+import speech_recognition as sr
+import os
 
 
 class CoffeeKiosk(QWidget):
@@ -11,8 +14,21 @@ class CoffeeKiosk(QWidget):
 
         self.initUI()
 
+        # # Dialogflow 인증 정보 설정
+        # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'dialogflow_key.json'
+        # self.project_id = 'PROJECT_ID'
+        # self.session_id = 'SESSION_ID'
+        # self.language_code = 'ko-KR'
+
+        # # Dialogflow 세션 생성
+        # self.session_client = dialogflow.SessionsClient()
+        # self.session = self.session_client.session_path(self.project_id, self.session_id)
+
     def initUI(self):
         self.setWindowTitle('커피 키오스크')
+
+        # 음성 인식 객체 생성
+        self.recognizer = sr.Recognizer()
 
         # 아메리카노 이미지 추가
         am_img = QLabel(self)
@@ -83,6 +99,11 @@ class CoffeeKiosk(QWidget):
         # 총 가격 레이블 추가
         self.total_price_label = QLabel('총 가격: 0원', self)
 
+        # 음성 인식 버튼 추가
+        voice_btn = QPushButton('음성 인식', self)
+        voice_btn.setStyleSheet("background-color: #A0522D; color: white;")
+        voice_btn.clicked.connect(self.voice_recognition)
+
         # 수직 박스 레이아웃에 위젯 추가
         vbox = QVBoxLayout()
         vbox.setAlignment(Qt.AlignCenter)
@@ -103,6 +124,7 @@ class CoffeeKiosk(QWidget):
 
         vbox.addWidget(self.total_price_label, alignment=Qt.AlignRight)
         vbox.addWidget(buy_btn, alignment=Qt.AlignRight)
+        vbox.addWidget(voice_btn, alignment=Qt.AlignRight)
 
         self.setLayout(vbox)
 
@@ -117,8 +139,44 @@ class CoffeeKiosk(QWidget):
     def cappuccino(self):
         pass
 
-    # def buy(self):
-    #     pass
+    def voice_recognition(self): 
+        with sr.Microphone() as source: # 마이크 사용할 수 있도록 설정
+            self.recognizer.adjust_for_ambient_noise(source) # 주변 소음 제거
+            audio = self.recognizer.listen(source) # 음성 녹음
+
+        try:
+            text = self.recognizer.recognize_google(audio, language='ko-KR') # 음성 텍스트로 변환
+            QMessageBox.information(self, '음성 인식 결과', f'음성 인식 결과: {text}')
+            self.select_coffee(text)
+        except sr.UnknownValueError:
+            QMessageBox.warning(self, '음성 인식 실패', '음성을 인식할 수 없습니다.')
+        except sr.RequestError as e:
+            QMessageBox.warning(self, '음성 인식 실패', f'음성 인식 API에 접근할 수 없습니다. {e}')
+
+    # def process_text(self, text):
+    #     # Dialogflow에 대화 요청
+    #     text_input = dialogflow.types.TextInput(text=text, language_code=self.language_code)
+    #     query_input = dialogflow.types.QueryInput(text=text_input)
+    #     response = self.session_client.detect_intent(session=self.session, query_input=query_input)
+
+    #     # 대화 결과 처리
+    #     if response.query_result.intent.display_name == 'order':
+    #         coffee = response.query_result.parameters.fields['coffee'].string_value
+    #         quantity = response.query_result.parameters.fields['quantity'].number_value
+    #         self.select_coffee(coffee, quantity)
+    #     else:
+    #         QMessageBox.warning(self, '대화 처리 실패', '대화 처리 결과가 없습니다.')
+
+    def select_coffee(self, coffee, quantity):
+        if coffee == '아메리카노':
+            self.am_spinbox.setValue(self.am_spinbox.value() + quantity)
+        elif coffee == '카페라떼':
+            self.latte_spinbox.setValue(self.latte_spinbox.value() + quantity)
+        elif coffee == '카푸치노':
+            self.capp_spinbox.setValue(self.capp_spinbox.value() + quantity)
+        else:
+            QMessageBox.warning(self, '음성 인식 실패', '음성 인식 결과에 해당하는 커피가 없습니다.')
+    
     def update_total_price(self):
         am_count = self.am_spinbox.value()
         latte_count = self.latte_spinbox.value()
