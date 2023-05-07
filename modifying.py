@@ -2,29 +2,30 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from google.cloud import dialogflow
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QGridLayout, QLabel,
-                             QMainWindow, QGridLayout, QSpinBox, QMessageBox, QAction, QMenuBar, QMenu, QInputDialog)
+                             QMainWindow, QGridLayout, QSpinBox, QMessageBox, QAction, QInputDialog)
 import sys
 import speech_recognition as sr
 import uuid
+import os
 
 class CoffeeKiosk(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.project_id = 'CoffeeKiosk'  # TODO: 프로젝트 ID로 변경
+        self.project_id = 'CoffeeKiosk' 
         self.session_client = dialogflow.SessionsClient()
         self.session = self.session_client.session_path(self.project_id, str(uuid.uuid4()))
 
         self.initUI()
-        # # Dialogflow 인증 정보 설정
-        # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'dialogflow_key.json'
-        # self.project_id = 'PROJECT_ID'
-        # self.session_id = 'SESSION_ID'
-        # self.language_code = 'ko-KR'
+        # Dialogflow 인증 정보 설정
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'dialogflow_key.json'
+        self.project_id = 'PROJECT_ID'
+        self.session_id = 'SESSION_ID'
+        self.language_code = 'ko-KR'
 
-        # # Dialogflow 세션 생성
-        # self.session_client = dialogflow.SessionsClient()
-        # self.session = self.session_client.session_path(self.project_id, self.session_id)
+        # Dialogflow 세션 생성
+        self.session_client = dialogflow.SessionsClient()
+        self.session = self.session_client.session_path(self.project_id, self.session_id)
 
     def initUI(self):
         self.setWindowTitle('커피 키오스크')
@@ -108,7 +109,7 @@ class CoffeeKiosk(QMainWindow):
         # 음성 인식 버튼 추가
         voice_btn = QPushButton('음성 인식', self)
         voice_btn.setStyleSheet("background-color: #A0522D; color: white;")
-        #voice_btn.clicked.connect(self.voice_recognition)
+        voice_btn.clicked.connect(self.voice_recognition)
 
 
          # 레이아웃 설정
@@ -258,12 +259,12 @@ class CoffeeKiosk(QMainWindow):
                     ]
                 )
 
-                # Dialogflow 인텐트 생성 요청
+                 # Dialogflow 인텐트 생성 요청
                 response = self.session_client.create_intent(
-                    parent=self.session_client.project_agent_path(self.project_id),
-                    intent=intent
+                     parent=self.session_client.project_agent_path(self.project_id),
+                     intent=intent
                 )
-                # TODO: 음료 추가 기능 구현
+                
                 QMessageBox.information(self, '음료 추가', f'{drink} 추가 완료')
 
     def modify_drink(self):
@@ -280,7 +281,7 @@ class CoffeeKiosk(QMainWindow):
                 intent.training_phrases[0].parts[0].text = drink
                 intent.parameters[0].default_value.string_value = str(price)
 
-                response = self.session_client.update_intent(intent)    # TODO: 음료 변경 기능 구현
+                response = self.session_client.update_intent(intent)
                 QMessageBox.information(self, '음료 변경', f'{drink} 변경 완료')
 
     def delete_drink(self):
@@ -290,7 +291,6 @@ class CoffeeKiosk(QMainWindow):
             intent_path = self.session_client.intent_path(self.project_id, drink)
             response = self.session_client.delete_intent(intent_path)
 
-            # TODO: 음료 삭제 기능 구현
             QMessageBox.information(self, '음료 삭제', f'{drink} 삭제 완료')
 
     def change_price(self):
@@ -306,7 +306,7 @@ class CoffeeKiosk(QMainWindow):
                 intent.parameters[0].default_value.string_value = str(price)
 
                 response = self.session_client.update_intent(intent)
-                # TODO: 가격 변경 기능 구현
+                
                 QMessageBox.information(self, '가격 변경', f'{drink} 가격 변경 완료')
 
 if __name__ == '__main__':
