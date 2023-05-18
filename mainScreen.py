@@ -34,7 +34,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 아메리카노 이미지 추가
         am_img = QLabel(self)
-        am_pixmap = QPixmap('americano.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        am_pixmap = QPixmap('pictures/americano.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         am_img.setPixmap(am_pixmap)
 
         # 아메리카노 가격 추가
@@ -54,7 +54,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 카페라떼 이미지 추가
         latte_img = QLabel(self)
-        latte_pixmap = QPixmap('latte.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        latte_pixmap = QPixmap('pictures/latte.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         latte_img.setPixmap(latte_pixmap)
 
         # 카페라떼 가격 추가
@@ -74,7 +74,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 카푸치노 이미지 추가
         capp_img = QLabel(self)
-        capp_pixmap = QPixmap('cappuccino.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        capp_pixmap = QPixmap('pictures/cappuccino.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         capp_img.setPixmap(capp_pixmap)
 
         # 카푸치노 가격 추가
@@ -94,7 +94,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 카라멜마끼야또 이미지 추가
         caramel_img = QLabel(self)
-        caramel_pixmap = QPixmap('caramelMacchiato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        caramel_pixmap = QPixmap('pictures/caramelMacchiato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         caramel_img.setPixmap(caramel_pixmap)
 
         # 카라멜마끼야또 가격 추가
@@ -113,7 +113,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 콜드블루 이미지 추가
         cb_img = QLabel(self)
-        cb_pixmap = QPixmap('coldbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        cb_pixmap = QPixmap('pictures/coldbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         cb_img.setPixmap(cb_pixmap)
 
         # 콜드블루 가격 추가
@@ -133,7 +133,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 돌체콜드블루 이미지 추가
         dcb_img = QLabel(self)
-        dcb_pixmap = QPixmap('dolceColdbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        dcb_pixmap = QPixmap('pictures/dolceColdbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         dcb_img.setPixmap(dcb_pixmap)
 
         # 돌체콜드블루 가격 추가
@@ -153,7 +153,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 바닐라 아포카토 이미지 추가
         vaff_img = QLabel(self)
-        vaff_pixmap = QPixmap('vanillaAffogato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        vaff_pixmap = QPixmap('pictures/vanillaAffogato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         vaff_img.setPixmap(vaff_pixmap)
 
         # 바닐라 아포카토 가격 추가
@@ -173,7 +173,7 @@ class CoffeeKiosk(QMainWindow):
 
         # 화이트 초콜릿 모카 이미지 추가
         wcm_img = QLabel(self)
-        wcm_pixmap = QPixmap('whiteChocolateMocha.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        wcm_pixmap = QPixmap('pictures/whiteChocolateMocha.jpg').scaled(200, 200, Qt.KeepAspectRatio)
         wcm_img.setPixmap(wcm_pixmap)
 
         # 화이트 초콜릿 모카 가격 추가
