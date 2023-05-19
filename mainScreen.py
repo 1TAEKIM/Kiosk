@@ -7,6 +7,43 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 
+class AdminLoginDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+
+    def initUI(self):
+        vbox = QVBoxLayout()
+
+        id_label = QLabel('아이디')
+        self.id_edit = QLineEdit()
+        vbox.addWidget(id_label)
+        vbox.addWidget(self.id_edit)
+
+        pw_label = QLabel('비밀번호')
+        self.pw_edit = QLineEdit()
+        self.pw_edit.setEchoMode(QLineEdit.Password)
+        vbox.addWidget(pw_label)
+        vbox.addWidget(self.pw_edit)
+
+        hbox = QHBoxLayout()
+        login_btn = QPushButton('로그인')
+        login_btn.clicked.connect(self.accept)
+        hbox.addWidget(login_btn)
+
+        cancel_btn = QPushButton('취소')
+        cancel_btn.clicked.connect(self.reject)
+        hbox.addWidget(cancel_btn)
+
+        vbox.addLayout(hbox)
+
+        self.setLayout(vbox)
+
+    def get_id_pw(self):
+        return self.id_edit.text(), self.pw_edit.text()
+
+
 class CoffeeKiosk(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -27,6 +64,14 @@ class CoffeeKiosk(QMainWindow):
         self.order_list = []
 
     def initUI(self):
+
+        menubar = self.menuBar()
+        admin_menu = menubar.addMenu('관리자')
+
+        admin_login_action = QAction('로그인', self)
+        admin_login_action.triggered.connect(self.show_admin_login)
+        admin_menu.addAction(admin_login_action)
+
         self.setWindowTitle('커피 키오스크')
 
         # 음성 인식 객체 생성
@@ -196,6 +241,11 @@ class CoffeeKiosk(QMainWindow):
         buy_btn.setStyleSheet("background-color: #A0522D; color: white;")
         buy_btn.clicked.connect(self.buy)
 
+        # 취소 버튼 추가
+        cancel_btn = QPushButton("취소", self)
+        cancel_btn.setStyleSheet("background-color: #A0522D; color: white;")
+        cancel_btn.clicked.connect(self.reset)
+
         # 총 가격 레이블 추가
         self.total_price_label = QLabel('총 가격: 0원', self)
 
@@ -335,9 +385,11 @@ class CoffeeKiosk(QMainWindow):
         grid.addWidget(self.order_table, 8, 0)
         grid.addWidget(self.total_price_label, 8, 1, alignment=Qt.AlignRight)
         grid.addWidget(buy_btn, 8, 2, alignment=Qt.AlignRight)
+        grid.addWidget(cancel_btn, 9, 2, alignment=Qt.AlignRight)
         grid.addWidget(voice_btn, 8, 3, alignment=Qt.AlignRight)
         self.setCentralWidget(widget)
 
+        
         self.setLayout(grid)
 
         self.show()
@@ -403,6 +455,7 @@ class CoffeeKiosk(QMainWindow):
     def cancel_order(self, row):
         self.order_list.pop(row)
         self.update_order_table()
+
 
     def get_price(self, coffee):
         if coffee == '아메리카노':
@@ -491,6 +544,28 @@ class CoffeeKiosk(QMainWindow):
                 self.update_total_price()
             else:
                 return
+            
+    def reset(self):
+        self.am_spinbox.setValue(0)
+        self.latte_spinbox.setValue(0)
+        self.capp_spinbox.setValue(0)
+        self.caramel_spinbox.setValue(0)
+        self.cb_spinbox.setValue(0)
+        self.dcb_spinbox.setValue(0)
+        self.vaff_spinbox.setValue(0)
+        self.wcm_spinbox.setValue(0)
+        self.order_table.setRowCount(0)
+        self.total_price_label.setText("총 가격: 0원")
+    
+    def show_admin_login(self):
+        dialog = AdminLoginDialog()
+        dialog.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.ImhNoAutoUppercase)
+        if dialog.exec_() == QDialog.Accepted:
+            id, pw = dialog.get_id_pw()
+            if id == 'admin' and pw == '1111':
+                QMessageBox.information(self, '로그인 성공', '로그인에 성공했습니다.')
+            else:
+                QMessageBox.warning(self, '로그인 실패', '아이디 또는 비밀번호가 올바르지 않습니다.')
             
 if __name__ == '__main__':
     app = QApplication(sys.argv)
