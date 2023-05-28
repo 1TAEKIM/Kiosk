@@ -1,6 +1,6 @@
+import sqlite3
 import sys
 import os
-import sqlite3
 from google.cloud import dialogflow
 import speech_recognition as sr
 from PyQt5.QtWidgets import *
@@ -13,32 +13,6 @@ class AdminLoginDialog(QDialog):
         super().__init__()
 
         self.initUI()
-
-        # coffee.db 파일과 연결
-        self.conn = sqlite3.connect('coffee.db')
-        # cursor 객체 생성
-        self.cur = self.conn.cursor()
-
-        self.cur.execute("CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price INTEGER, quantity INTEGER)")
-        self.cur.execute("CREATE TABLE IF NOT EXISTS drinks (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price INTEGER, image TEXT)")
-        self.conn.commit()
-
-        self.add_drink('아메리카노', 4500, 'images/americano.jpg')
-        self.add_drink('카페라떼', 5000, 'images/latte.jpg')
-        self.add_drink('카푸치노', 5000, 'images/cappuccino.jpg')
-        self.add_drink('카라멜 마키아또', 4500, 'images/caramelMacchiato.jpg')
-        self.add_drink('콜드블루', 4500, 'images/coldbrew.jpg')
-        self.add_drink('돌체콜드블루', 5000, 'images/dolceColdbrew.jpg')
-        self.add_drink('바닐라 아포카토', 5000, 'images/vanillaAffogato.jpg')
-        self.add_drink('화이트 초콜릿 모카', 4500, 'images/whiteChocolateMocha.jpg')
-
-    def add_drink(self, name, price, image):
-        self.cur.execute("INSERT INTO drinks (name, price, image) VALUES (?, ?, ?)", (name, price, image))
-        self.conn.commit()
-        
-    # 프로그램이 종료 될 때 DB와의 연결을 끊어줌
-    def closeEvent(self, event):
-        self.conn.close()
 
     def initUI(self):
         vbox = QVBoxLayout()
@@ -104,164 +78,218 @@ class CoffeeKiosk(QMainWindow):
         # 음성 인식 객체 생성
         self.recognizer = sr.Recognizer()
 
-        # 아메리카노 이미지 추가
-        am_img = QLabel(self)
-        am_pixmap = QPixmap('pictures/americano.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        am_img.setPixmap(am_pixmap)
+        # # 아메리카노 이미지 추가
+        # am_img = QLabel(self)
+        # am_pixmap = QPixmap('pictures/ice_americano.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # am_img.setPixmap(am_pixmap)
 
-        # 아메리카노 가격 추가
-        self.am_price = 4500
-        am_price_label = QLabel(f'{self.am_price}원', self)
+        # # 아메리카노 가격 추가
+        # self.am_price = 4500
+        # am_price_label = QLabel(f'{self.am_price}원', self)
 
-        # 아메리카노 개수 선택
-        self.am_spinbox = QSpinBox(self)
-        self.am_spinbox.setMinimum(0)
-        self.am_spinbox.setMaximum(20)
-        self.am_spinbox.valueChanged.connect(self.update_total_price)
+        # # 아메리카노 개수 선택
+        # self.am_spinbox = QSpinBox(self)
+        # self.am_spinbox.setMinimum(0)
+        # self.am_spinbox.setMaximum(20)
+        # self.am_spinbox.valueChanged.connect(self.update_total_price)
 
-        # 아메리카노 버튼 추가
-        btn1 = QPushButton('아메리카노', self)
-        btn1.setStyleSheet("background-color: #A0522D; color: white;")
-        btn1.clicked.connect(self.americano)
+        # # 아메리카노 버튼 추가
+        # btn1 = QPushButton('아메리카노', self)
+        # btn1.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn1.clicked.connect(self.americano)
 
-        # 카페라떼 이미지 추가
-        latte_img = QLabel(self)
-        latte_pixmap = QPixmap('pictures/latte.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        latte_img.setPixmap(latte_pixmap)
+        # # 카페라떼 이미지 추가
+        # latte_img = QLabel(self)
+        # latte_pixmap = QPixmap('pictures/hot_latte.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # latte_img.setPixmap(latte_pixmap)
 
-        # 카페라떼 가격 추가
-        self.latte_price = 5000
-        latte_price_label = QLabel(f'{self.latte_price}원', self)
+        # # 카페라떼 가격 추가
+        # self.latte_price = 5000
+        # latte_price_label = QLabel(f'{self.latte_price}원', self)
 
-        # 카페라떼 개수 선택
-        self.latte_spinbox = QSpinBox(self)
-        self.latte_spinbox.setMinimum(0)
-        self.latte_spinbox.setMaximum(20)
-        self.latte_spinbox.valueChanged.connect(self.update_total_price)
+        # # 카페라떼 개수 선택
+        # self.latte_spinbox = QSpinBox(self)
+        # self.latte_spinbox.setMinimum(0)
+        # self.latte_spinbox.setMaximum(20)
+        # self.latte_spinbox.valueChanged.connect(self.update_total_price)
 
-        # 카페라떼 버튼 추가
-        btn2 = QPushButton('카페라떼', self)
-        btn2.setStyleSheet("background-color: #A0522D; color: white;")
-        btn2.clicked.connect(self.latte)
+        # # 카페라떼 버튼 추가
+        # btn2 = QPushButton('카페라떼', self)
+        # btn2.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn2.clicked.connect(self.latte)
 
-        # 카푸치노 이미지 추가
-        capp_img = QLabel(self)
-        capp_pixmap = QPixmap('pictures/cappuccino.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        capp_img.setPixmap(capp_pixmap)
+        # # 카푸치노 이미지 추가
+        # capp_img = QLabel(self)
+        # capp_pixmap = QPixmap('pictures/hot_cappuccino.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # capp_img.setPixmap(capp_pixmap)
 
-        # 카푸치노 가격 추가
-        self.capp_price = 5000
-        capp_price_label = QLabel(f'{self.capp_price}원', self)
+        # # 카푸치노 가격 추가
+        # self.capp_price = 5000
+        # capp_price_label = QLabel(f'{self.capp_price}원', self)
 
-        # 카푸치노 개수 선택
-        self.capp_spinbox = QSpinBox(self)
-        self.capp_spinbox.setMinimum(0)
-        self.capp_spinbox.setMaximum(20)
-        self.capp_spinbox.valueChanged.connect(self.update_total_price)
+        # # 카푸치노 개수 선택
+        # self.capp_spinbox = QSpinBox(self)
+        # self.capp_spinbox.setMinimum(0)
+        # self.capp_spinbox.setMaximum(20)
+        # self.capp_spinbox.valueChanged.connect(self.update_total_price)
 
-        # 카푸치노 버튼 추가
-        btn3 = QPushButton('카푸치노', self)
-        btn3.setStyleSheet("background-color: #A0522D; color: white;")
-        btn3.clicked.connect(self.cappuccino)
+        # # 카푸치노 버튼 추가
+        # btn3 = QPushButton('카푸치노', self)
+        # btn3.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn3.clicked.connect(self.cappuccino)
 
-        # 카라멜마끼야또 이미지 추가
-        caramel_img = QLabel(self)
-        caramel_pixmap = QPixmap('pictures/caramelMacchiato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        caramel_img.setPixmap(caramel_pixmap)
+        # # 카라멜마끼야또 이미지 추가
+        # caramel_img = QLabel(self)
+        # caramel_pixmap = QPixmap('pictures/hot_caramelMacchiato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # caramel_img.setPixmap(caramel_pixmap)
 
-        # 카라멜마끼야또 가격 추가
-        self.caramel_price = 4500
-        caramel_price_label = QLabel(f'{self.caramel_price}원', self)
+        # # 카라멜마끼야또 가격 추가
+        # self.caramel_price = 4500
+        # caramel_price_label = QLabel(f'{self.caramel_price}원', self)
 
-        # 카라멜마끼야또 개수 선택
-        self.caramel_spinbox = QSpinBox(self)
-        self.caramel_spinbox.setMinimum(0)
-        self.caramel_spinbox.setMaximum(20)
-        self.caramel_spinbox.valueChanged.connect(self.update_total_price)
-        # 카라멜마끼야또 버튼 추가
-        btn4 = QPushButton('카라멜마끼야또', self)
-        btn4.setStyleSheet("background-color: #A0522D; color: white;")
-        btn4.clicked.connect(self.caramel)
+        # # 카라멜마끼야또 개수 선택
+        # self.caramel_spinbox = QSpinBox(self)
+        # self.caramel_spinbox.setMinimum(0)
+        # self.caramel_spinbox.setMaximum(20)
+        # self.caramel_spinbox.valueChanged.connect(self.update_total_price)
+        # # 카라멜마끼야또 버튼 추가
+        # btn4 = QPushButton('카라멜마끼야또', self)
+        # btn4.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn4.clicked.connect(self.caramel)
 
-        # 콜드블루 이미지 추가
-        cb_img = QLabel(self)
-        cb_pixmap = QPixmap('pictures/coldbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        cb_img.setPixmap(cb_pixmap)
+        # # 콜드블루 이미지 추가
+        # cb_img = QLabel(self)
+        # cb_pixmap = QPixmap('pictures/ice_coldbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # cb_img.setPixmap(cb_pixmap)
 
-        # 콜드블루 가격 추가
-        self.cb_price = 4500
-        cb_price_label = QLabel(f'{self.cb_price}원', self)
+        # # 콜드블루 가격 추가
+        # self.cb_price = 4500
+        # cb_price_label = QLabel(f'{self.cb_price}원', self)
 
-        # 콜드블루 개수 선택
-        self.cb_spinbox = QSpinBox(self)
-        self.cb_spinbox.setMinimum(0)
-        self.cb_spinbox.setMaximum(20)
-        self.cb_spinbox.valueChanged.connect(self.update_total_price)
+        # # 콜드블루 개수 선택
+        # self.cb_spinbox = QSpinBox(self)
+        # self.cb_spinbox.setMinimum(0)
+        # self.cb_spinbox.setMaximum(20)
+        # self.cb_spinbox.valueChanged.connect(self.update_total_price)
 
-        # 콜드블루 버튼 추가
-        btn5 = QPushButton('콜드블루', self)
-        btn5.setStyleSheet("background-color: #A0522D; color: white;")
-        btn5.clicked.connect(self.cb)
+        # # 콜드블루 버튼 추가
+        # btn5 = QPushButton('콜드블루', self)
+        # btn5.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn5.clicked.connect(self.cb)
 
-        # 돌체콜드블루 이미지 추가
-        dcb_img = QLabel(self)
-        dcb_pixmap = QPixmap('pictures/dolceColdbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        dcb_img.setPixmap(dcb_pixmap)
+        # # 돌체콜드블루 이미지 추가
+        # dcb_img = QLabel(self)
+        # dcb_pixmap = QPixmap('pictures/ice_dolceColdbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # dcb_img.setPixmap(dcb_pixmap)
 
-        # 돌체콜드블루 가격 추가
-        self.dcb_price = 5000
-        dcb_price_label = QLabel(f'{self.dcb_price}원', self)
+        # # 돌체콜드블루 가격 추가
+        # self.dcb_price = 5000
+        # dcb_price_label = QLabel(f'{self.dcb_price}원', self)
 
-        # 돌체콜드블루 개수 선택
-        self.dcb_spinbox = QSpinBox(self)
-        self.dcb_spinbox.setMinimum(0)
-        self.dcb_spinbox.setMaximum(20)
-        self.dcb_spinbox.valueChanged.connect(self.update_total_price)
+        # # 돌체콜드블루 개수 선택
+        # self.dcb_spinbox = QSpinBox(self)
+        # self.dcb_spinbox.setMinimum(0)
+        # self.dcb_spinbox.setMaximum(20)
+        # self.dcb_spinbox.valueChanged.connect(self.update_total_price)
 
-        # 돌체콜드블루 버튼 추가
-        btn6 = QPushButton('돌체콜드블루', self)
-        btn6.setStyleSheet("background-color: #A0522D; color: white;")
-        btn6.clicked.connect(self.dcb)
+        # # 돌체콜드블루 버튼 추가
+        # btn6 = QPushButton('돌체콜드블루', self)
+        # btn6.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn6.clicked.connect(self.dcb)
 
-        # 바닐라 아포카토 이미지 추가
-        vaff_img = QLabel(self)
-        vaff_pixmap = QPixmap('pictures/vanillaAffogato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        vaff_img.setPixmap(vaff_pixmap)
+        # # 바닐라 아포카토 이미지 추가
+        # vaff_img = QLabel(self)
+        # vaff_pixmap = QPixmap('pictures/ice_vanillaAffogato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # vaff_img.setPixmap(vaff_pixmap)
 
-        # 바닐라 아포카토 가격 추가
-        self.vaff_price = 5000
-        vaff_price_label = QLabel(f'{self.vaff_price}원', self)
+        # # 바닐라 아포카토 가격 추가
+        # self.vaff_price = 5000
+        # vaff_price_label = QLabel(f'{self.vaff_price}원', self)
 
-        # 바닐라 아포카토 개수 선택
-        self.vaff_spinbox = QSpinBox(self)
-        self.vaff_spinbox.setMinimum(0)
-        self.vaff_spinbox.setMaximum(20)
-        self.vaff_spinbox.valueChanged.connect(self.update_total_price)
+        # # 바닐라 아포카토 개수 선택
+        # self.vaff_spinbox = QSpinBox(self)
+        # self.vaff_spinbox.setMinimum(0)
+        # self.vaff_spinbox.setMaximum(20)
+        # self.vaff_spinbox.valueChanged.connect(self.update_total_price)
 
-        # 바닐라 아포카토 버튼 추가
-        btn7 = QPushButton('바닐라 아포카토', self)
-        btn7.setStyleSheet("background-color: #A0522D; color: white;")
-        btn7.clicked.connect(self.vaff)
+        # # 바닐라 아포카토 버튼 추가
+        # btn7 = QPushButton('바닐라 아포카토', self)
+        # btn7.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn7.clicked.connect(self.vaff)
 
-        # 화이트 초콜릿 모카 이미지 추가
-        wcm_img = QLabel(self)
-        wcm_pixmap = QPixmap('pictures/whiteChocolateMocha.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        wcm_img.setPixmap(wcm_pixmap)
+        # # 화이트 초콜릿 모카 이미지 추가
+        # wcm_img = QLabel(self)
+        # wcm_pixmap = QPixmap('pictures/ice_whiteChocolateMocha.jpg').scaled(200, 200, Qt.KeepAspectRatio)
+        # wcm_img.setPixmap(wcm_pixmap)
 
-        # 화이트 초콜릿 모카 가격 추가
-        self.wcm_price = 4500
-        wcm_price_label = QLabel(f'{self.wcm_price}원', self)
+        # # 화이트 초콜릿 모카 가격 추가
+        # self.wcm_price = 4500
+        # wcm_price_label = QLabel(f'{self.wcm_price}원', self)
 
-        # 화이트 초콜릿 모카 개수 선택
-        self.wcm_spinbox = QSpinBox(self)
-        self.wcm_spinbox.setMinimum(0)
-        self.wcm_spinbox.setMaximum(20)
-        self.wcm_spinbox.valueChanged.connect(self.update_total_price)
+        # # 화이트 초콜릿 모카 개수 선택
+        # self.wcm_spinbox = QSpinBox(self)
+        # self.wcm_spinbox.setMinimum(0)
+        # self.wcm_spinbox.setMaximum(20)
+        # self.wcm_spinbox.valueChanged.connect(self.update_total_price)
 
-        # 화이트 초콜릿 모카 버튼 추가
-        btn8 = QPushButton('화이트 초콜릿 모카', self)
-        btn8.setStyleSheet("background-color: #A0522D; color: white;")
-        btn8.clicked.connect(self.wcm)
+        # # 화이트 초콜릿 모카 버튼 추가
+        # btn8 = QPushButton('화이트 초콜릿 모카', self)
+        # btn8.setStyleSheet("background-color: #A0522D; color: white;")
+        # btn8.clicked.connect(self.wcm)
+
+        # Create a central widget
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+
+        # Create a grid layout
+        layout = QGridLayout(central_widget)
+        layout.setAlignment(Qt.AlignCenter)
+
+        # Connect to the SQLite database
+        conn = sqlite3.connect('coffee.db')
+        cursor = conn.cursor()
+
+        # Fetch the menu items from the database
+        cursor.execute("SELECT * FROM coffee")
+        menu_items = cursor.fetchall()
+
+        # Create the menu items dynamically using a loop
+        for index, item in enumerate(menu_items):
+            name = item[1]
+            image_path = item[2]
+            price = item[3]
+
+            # Create QLabel for the image
+            image_label = QLabel(self)
+            pixmap = QPixmap(image_path).scaled(200, 200, Qt.KeepAspectRatio)
+            image_label.setPixmap(pixmap)
+
+            # Create QLabel for the price
+            price_label = QLabel(f'{price}원', self)
+
+            # Create QSpinBox for quantity selection
+            spinbox = QSpinBox(self)
+            spinbox.setMinimum(0)
+            spinbox.setMaximum(20)
+            spinbox.valueChanged.connect(self.update_total_price)
+
+            # Create QPushButton for menu item
+            btn = QPushButton(name, self)
+            btn.setStyleSheet("background-color: #A0522D; color: white;")
+            btn.clicked.connect(self.menu_item_clicked)
+
+            # Add the widgets to the layout
+            layout.addWidget(image_label, index // 4 * 4, index % 4)
+            layout.addWidget(price_label, index // 4 * 4 + 1, index % 4)
+            layout.addWidget(spinbox, index // 4 * 4 + 2, index % 4)
+            layout.addWidget(btn, index // 4 * 4 + 3, index % 4)
+
+        # Set column and row stretch
+        layout.setColumnStretch(0, 1)
+        layout.setRowStretch(index // 4 + 3, 1)
+
+        # Close the database connection
+        # conn.close()
 
         # 구매 버튼 추가
         buy_btn = QPushButton('구매', self)
@@ -289,137 +317,144 @@ class CoffeeKiosk(QMainWindow):
         self.order_table.setColumnWidth(2, 100)
         self.order_table.setColumnWidth(3, 50)
 
-        # 음성 인식 버튼 추가
-        voice_btn = QPushButton('음성 인식', self)
-        voice_btn.setStyleSheet("background-color: #A0522D; color: white;")
-        voice_btn.clicked.connect(self.voice_recognition)
+        # # 음성 인식 버튼 추가
+        # voice_btn = QPushButton('음성 인식', self)
+        # voice_btn.setStyleSheet("background-color: #A0522D; color: white;")
+        # voice_btn.clicked.connect(self.voice_recognition)
 
-        # 수직 박스 레이아웃에 위젯 추가
-        widget = QWidget()
-        vbox = QVBoxLayout(widget)
-        vbox.setAlignment(Qt.AlignCenter)
-        vbox.addWidget(am_img)
-        vbox.addWidget(am_price_label)
-        vbox.addWidget(self.am_spinbox)
-        vbox.addWidget(btn1)
-        widget1 = QWidget()
-        widget1.setLayout(vbox)
-        self.setCentralWidget(widget)
+        
 
-        vbox.addWidget(latte_img)
-        vbox.addWidget(latte_price_label)
-        vbox.addWidget(self.latte_spinbox)
-        vbox.addWidget(btn2)
-        widget2 = QWidget()
-        widget2.setLayout(vbox)
-        self.setCentralWidget(widget)
+        # # 수직 박스 레이아웃에 위젯 추가
+        # widget = QWidget()
+        # vbox = QVBoxLayout(widget)
+        # vbox.setAlignment(Qt.AlignCenter)
+        # vbox.addWidget(am_img)
+        # vbox.addWidget(am_price_label)
+        # vbox.addWidget(self.am_spinbox)
+        # vbox.addWidget(btn1)
+        # widget1 = QWidget()
+        # widget1.setLayout(vbox)
+        # self.setCentralWidget(widget)
 
-        vbox.addWidget(capp_img)
-        vbox.addWidget(capp_price_label)
-        vbox.addWidget(self.capp_spinbox)
-        vbox.addWidget(btn3)
-        widget3 = QWidget()
-        widget3.setLayout(vbox)
-        self.setCentralWidget(widget)
+        # vbox.addWidget(latte_img)
+        # vbox.addWidget(latte_price_label)
+        # vbox.addWidget(self.latte_spinbox)
+        # vbox.addWidget(btn2)
+        # widget2 = QWidget()
+        # widget2.setLayout(vbox)
+        # self.setCentralWidget(widget)
 
-        vbox.addWidget(caramel_img)
-        vbox.addWidget(caramel_price_label)
-        vbox.addWidget(self.caramel_spinbox)
-        vbox.addWidget(btn4)
-        widget4 = QWidget()
-        widget4.setLayout(vbox)
-        self.setCentralWidget(widget)
+        # vbox.addWidget(capp_img)
+        # vbox.addWidget(capp_price_label)
+        # vbox.addWidget(self.capp_spinbox)
+        # vbox.addWidget(btn3)
+        # widget3 = QWidget()
+        # widget3.setLayout(vbox)
+        # self.setCentralWidget(widget)
 
-        vbox.addWidget(cb_img)
-        vbox.addWidget(cb_price_label)
-        vbox.addWidget(self.cb_spinbox)
-        vbox.addWidget(btn5)
-        widget5 = QWidget()
-        widget5.setLayout(vbox)
-        self.setCentralWidget(widget)
+        # vbox.addWidget(caramel_img)
+        # vbox.addWidget(caramel_price_label)
+        # vbox.addWidget(self.caramel_spinbox)
+        # vbox.addWidget(btn4)
+        # widget4 = QWidget()
+        # widget4.setLayout(vbox)
+        # self.setCentralWidget(widget)
 
-        vbox.addWidget(dcb_img)
-        vbox.addWidget(dcb_price_label)
-        vbox.addWidget(self.dcb_spinbox)
-        vbox.addWidget(btn6)
-        widget6 = QWidget()
-        widget6.setLayout(vbox)
-        self.setCentralWidget(widget)
+        # vbox.addWidget(cb_img)
+        # vbox.addWidget(cb_price_label)
+        # vbox.addWidget(self.cb_spinbox)
+        # vbox.addWidget(btn5)
+        # widget5 = QWidget()
+        # widget5.setLayout(vbox)
+        # self.setCentralWidget(widget)
 
-        vbox.addWidget(vaff_img)
-        vbox.addWidget(vaff_price_label)
-        vbox.addWidget(self.vaff_spinbox)
-        vbox.addWidget(btn7)
-        widget7 = QWidget()
-        widget7.setLayout(vbox)
-        self.setCentralWidget(widget)
+        # vbox.addWidget(dcb_img)
+        # vbox.addWidget(dcb_price_label)
+        # vbox.addWidget(self.dcb_spinbox)
+        # vbox.addWidget(btn6)
+        # widget6 = QWidget()
+        # widget6.setLayout(vbox)
+        # self.setCentralWidget(widget)
 
-        vbox.addWidget(wcm_img)
-        vbox.addWidget(wcm_price_label)
-        vbox.addWidget(self.wcm_spinbox)
-        vbox.addWidget(btn8)
-        widget8 = QWidget()
-        widget8.setLayout(vbox)
-        self.setCentralWidget(widget)
+        # vbox.addWidget(vaff_img)
+        # vbox.addWidget(vaff_price_label)
+        # vbox.addWidget(self.vaff_spinbox)
+        # vbox.addWidget(btn7)
+        # widget7 = QWidget()
+        # widget7.setLayout(vbox)
+        # self.setCentralWidget(widget)
+
+        # vbox.addWidget(wcm_img)
+        # vbox.addWidget(wcm_price_label)
+        # vbox.addWidget(self.wcm_spinbox)
+        # vbox.addWidget(btn8)
+        # widget8 = QWidget()
+        # widget8.setLayout(vbox)
+        # self.setCentralWidget(widget)
 
         # QGridLayout으로 레이아웃 변경
         widget = QWidget()
         grid = QGridLayout(widget)
-        grid.setAlignment(Qt.AlignCenter)
+        # grid.setAlignment(Qt.AlignCenter)
 
-        grid.addWidget(am_img, 0, 0)
-        grid.addWidget(am_price_label, 1, 0)
-        grid.addWidget(self.am_spinbox, 2, 0)
-        grid.addWidget(btn1, 3, 0)
+        # grid.addWidget(am_img, 0, 0)
+        # grid.addWidget(am_price_label, 1, 0)
+        # grid.addWidget(self.am_spinbox, 2, 0)
+        # grid.addWidget(btn1, 3, 0)
 
-        grid.addWidget(latte_img, 0, 1)
-        grid.addWidget(latte_price_label, 1, 1)
-        grid.addWidget(self.latte_spinbox, 2, 1)
-        grid.addWidget(btn2, 3, 1)
+        # grid.addWidget(latte_img, 0, 1)
+        # grid.addWidget(latte_price_label, 1, 1)
+        # grid.addWidget(self.latte_spinbox, 2, 1)
+        # grid.addWidget(btn2, 3, 1)
 
-        grid.addWidget(capp_img, 0, 2)
-        grid.addWidget(capp_price_label, 1, 2)
-        grid.addWidget(self.capp_spinbox, 2, 2)
-        grid.addWidget(btn3, 3, 2)
+        # grid.addWidget(capp_img, 0, 2)
+        # grid.addWidget(capp_price_label, 1, 2)
+        # grid.addWidget(self.capp_spinbox, 2, 2)
+        # grid.addWidget(btn3, 3, 2)
 
-        grid.addWidget(caramel_img, 0, 3)
-        grid.addWidget(caramel_price_label, 1, 3)
-        grid.addWidget(self.caramel_spinbox, 2, 3)
-        grid.addWidget(btn4, 3, 3)
+        # grid.addWidget(caramel_img, 0, 3)
+        # grid.addWidget(caramel_price_label, 1, 3)
+        # grid.addWidget(self.caramel_spinbox, 2, 3)
+        # grid.addWidget(btn4, 3, 3)
 
-        grid.addWidget(cb_img, 4, 0)
-        grid.addWidget(cb_price_label, 5, 0)
-        grid.addWidget(self.cb_spinbox, 6, 0)
-        grid.addWidget(btn5, 7, 0)
+        # grid.addWidget(cb_img, 4, 0)
+        # grid.addWidget(cb_price_label, 5, 0)
+        # grid.addWidget(self.cb_spinbox, 6, 0)
+        # grid.addWidget(btn5, 7, 0)
 
-        grid.addWidget(dcb_img, 4, 1)
-        grid.addWidget(dcb_price_label, 5, 1)
-        grid.addWidget(self.dcb_spinbox, 6, 1)
-        grid.addWidget(btn6, 7, 1)
+        # grid.addWidget(dcb_img, 4, 1)
+        # grid.addWidget(dcb_price_label, 5, 1)
+        # grid.addWidget(self.dcb_spinbox, 6, 1)
+        # grid.addWidget(btn6, 7, 1)
 
-        grid.addWidget(vaff_img, 4, 2)
-        grid.addWidget(vaff_price_label, 5, 2)
-        grid.addWidget(self.vaff_spinbox, 6, 2)
-        grid.addWidget(btn7, 7, 2)
+        # grid.addWidget(vaff_img, 4, 2)
+        # grid.addWidget(vaff_price_label, 5, 2)
+        # grid.addWidget(self.vaff_spinbox, 6, 2)
+        # grid.addWidget(btn7, 7, 2)
 
-        grid.addWidget(wcm_img, 4, 3)
-        grid.addWidget(wcm_price_label, 5, 3)
-        grid.addWidget(self.wcm_spinbox, 6, 3)
-        grid.addWidget(btn8, 7, 3)
+        # grid.addWidget(wcm_img, 4, 3)
+        # grid.addWidget(wcm_price_label, 5, 3)
+        # grid.addWidget(self.wcm_spinbox, 6, 3)
+        # grid.addWidget(btn8, 7, 3)
 
-        self.setCentralWidget(widget)
+        # self.setCentralWidget(widget)
 
         grid.addWidget(self.order_table, 8, 0)
         grid.addWidget(self.total_price_label, 8, 1, alignment=Qt.AlignRight)
         grid.addWidget(buy_btn, 8, 2, alignment=Qt.AlignRight)
         grid.addWidget(cancel_btn, 9, 2, alignment=Qt.AlignRight)
-        grid.addWidget(voice_btn, 8, 3, alignment=Qt.AlignRight)
-        self.setCentralWidget(widget)
+        # grid.addWidget(voice_btn, 8, 3, alignment=Qt.AlignRight)
+        #self.setCentralWidget(widget)
 
         
-        self.setLayout(grid)
+        # self.setLayout(grid)
 
         self.show()
+        conn.close()
+
+    def menu_item_clicked(self):
+        sender = self.sender()
+        item_name = sender.text()
 
     def americano(self):
         self.add_order('아메리카노', self.am_spinbox.value(), self.am_price)
@@ -590,11 +625,37 @@ class CoffeeKiosk(QMainWindow):
         if dialog.exec_() == QDialog.Accepted:
             id, pw = dialog.get_id_pw()
             if id == 'admin' and pw == '1111':
-                QMessageBox.information(self, '로그인 성공', '로그인에 성공했습니다.')
+                self.show_new_window()
+                #QMessageBox.information(self, '로그인 성공', '로그인에 성공했습니다.')
             else:
                 QMessageBox.warning(self, '로그인 실패', '아이디 또는 비밀번호가 올바르지 않습니다.')
-            
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = CoffeeKiosk()
-    sys.exit(app.exec_())
+
+    def show_new_window(self):
+        self.new_window = QMainWindow()
+        self.new_window.setWindowTitle('관리자 창')
+
+
+        label = QLabel("새로운 창")
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.new_window.setCentralWidget(widget)
+        self.new_window.show()
+
+    def closeEvent(self, event):
+        if self.new_window is not None:
+            self.new_window.close()
+        event.accept()
+
+    
+# 메인 애플리케이션 실행
+app = QApplication([])
+window = CoffeeKiosk()
+# window.show_admin_login()
+app.exec_()
+
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     window = CoffeeKiosk()
+#     sys.exit(app.exec_())
