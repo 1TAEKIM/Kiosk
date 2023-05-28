@@ -55,7 +55,7 @@ class CoffeeKiosk(QMainWindow):
         self.initUI()
 
         # Dialogflow 인증 정보 설정
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'capstone-kiosk-eff1d91cef43.json'
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'client_secret_665161917490-m62db4qm2gbipgmt8cbujre67skcrt7e.apps.googleusercontent.com.json'
         self.project_id = 'PROJECT_ID'
         self.session_id = 'SESSION_ID'
         self.language_code = 'ko-KR'
@@ -77,7 +77,7 @@ class CoffeeKiosk(QMainWindow):
         self.initUI()
 
         # Dialogflow 인증 정보 설정
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'capstone-kiosk-eff1d91cef43.json'
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'client_secret_665161917490-m62db4qm2gbipgmt8cbujre67skcrt7e.apps.googleusercontent.com.json'
         self.project_id = 'PROJECT_ID'
         self.session_id = 'SESSION_ID'
         self.language_code = 'ko-KR'
