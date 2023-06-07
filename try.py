@@ -45,6 +45,48 @@ class AdminLoginDialog(QDialog):
     def get_id_pw(self):
         return self.id_edit.text(), self.pw_edit.text()
 
+class CoffeeShop(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # UI 초기화
+        self.label = QLabel(self)
+        self.label.setScaledContents(True)
+        self.label.setGeometry(10, 10, 720, 960)
+
+        # 데이터베이스에서 커피 정보 가져오기
+        self.updateCoffeeInfo()
+
+        # 2초마다 커피 정보 업데이트
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.updateCoffeeInfo)
+        self.timer.start(2000)
+
+    def updateCoffeeInfo(self):
+        # Connect to coffee.db
+        conn = sqlite3.connect("coffee.db")
+        cursor = conn.cursor()
+
+        # Fetch a random coffee from the database
+        cursor.execute("SELECT image, name, price FROM coffee ORDER BY RANDOM() LIMIT 1")
+        coffee = cursor.fetchone()
+
+        if coffee is not None:
+            image, name, price = coffee
+
+            # Load image from file
+            pixmap = QPixmap(image)
+            self.label.setPixmap(pixmap)
+            self.label.setToolTip(f"Name: {name}\nPrice: {price}")
+
+        # Close database connection
+        conn.close()
+
+    def mousePressEvent(self, event):
+        # 클릭 시 창 닫히고 CoffeeKiosk 클래스 실행
+        self.close()
+        self.kiosk = CoffeeKiosk()
+        self.kiosk.show()
 
 class CoffeeKiosk(QMainWindow):
     def __init__(self):
@@ -183,9 +225,19 @@ class CoffeeKiosk(QMainWindow):
         self.total_price_label = QLabel()
         layout.addWidget(self.total_price_label, (index // 4) * 4 + 5, 3, 1, 4)
 
+        # 창의 크기를 설정
+        window_width = 818
+        window_height = 1038
 
-        # Close the database connection
+        # 현재 화면의 가운데 위치를 계산
+        screen_geometry = QDesktopWidget().availableGeometry()
+        x = (screen_geometry.width() - window_width) // 2
+        y = (screen_geometry.height() - window_height) // 2
+
+        # 창의 위치와 크기 설정
+        self.setGeometry(x, y, window_width, window_height)
         self.show()
+        # Close the database connection
         conn.close()
 
     def menu_item_clicked(self, name):
@@ -392,8 +444,28 @@ class CoffeeKiosk(QMainWindow):
             self.new_window.close()
         event.accept()
 
-# 메인 애플리케이션 실행
-app = QApplication([])
-window = CoffeeKiosk()
-# window.show_admin_login()
-app.exec_()
+# # 메인 애플리케이션 실행
+# app = QApplication([])
+# window = CoffeeKiosk()
+# # window.show_admin_login()
+# app.exec_()
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    coffeeShop = CoffeeShop()
+    # 창의 크기를 설정
+    window_width = 818
+    window_height = 1038
+
+    # 현재 화면의 가운데 위치를 계산
+    screen_geometry = QDesktopWidget().availableGeometry()
+    x = (screen_geometry.width() - window_width) // 2
+    y = (screen_geometry.height() - window_height) // 2
+
+    # 창의 위치와 크기 설정
+    coffeeShop.setGeometry(x, y, window_width, window_height)
+    coffeeShop.show()
+    sys.exit(app.exec_())
+
+
