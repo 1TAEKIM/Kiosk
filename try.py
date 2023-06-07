@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 import sys
 import os
 from google.cloud import dialogflow
@@ -49,6 +50,8 @@ class CoffeeKiosk(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.order_items = []
+        self.total_price = 0
         self.initUI()
 
         # Dialogflow 인증 정보 설정
@@ -78,164 +81,6 @@ class CoffeeKiosk(QMainWindow):
         # 음성 인식 객체 생성
         self.recognizer = sr.Recognizer()
 
-        # # 아메리카노 이미지 추가
-        # am_img = QLabel(self)
-        # am_pixmap = QPixmap('pictures/ice_americano.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # am_img.setPixmap(am_pixmap)
-
-        # # 아메리카노 가격 추가
-        # self.am_price = 4500
-        # am_price_label = QLabel(f'{self.am_price}원', self)
-
-        # # 아메리카노 개수 선택
-        # self.am_spinbox = QSpinBox(self)
-        # self.am_spinbox.setMinimum(0)
-        # self.am_spinbox.setMaximum(20)
-        # self.am_spinbox.valueChanged.connect(self.update_total_price)
-
-        # # 아메리카노 버튼 추가
-        # btn1 = QPushButton('아메리카노', self)
-        # btn1.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn1.clicked.connect(self.americano)
-
-        # # 카페라떼 이미지 추가
-        # latte_img = QLabel(self)
-        # latte_pixmap = QPixmap('pictures/hot_latte.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # latte_img.setPixmap(latte_pixmap)
-
-        # # 카페라떼 가격 추가
-        # self.latte_price = 5000
-        # latte_price_label = QLabel(f'{self.latte_price}원', self)
-
-        # # 카페라떼 개수 선택
-        # self.latte_spinbox = QSpinBox(self)
-        # self.latte_spinbox.setMinimum(0)
-        # self.latte_spinbox.setMaximum(20)
-        # self.latte_spinbox.valueChanged.connect(self.update_total_price)
-
-        # # 카페라떼 버튼 추가
-        # btn2 = QPushButton('카페라떼', self)
-        # btn2.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn2.clicked.connect(self.latte)
-
-        # # 카푸치노 이미지 추가
-        # capp_img = QLabel(self)
-        # capp_pixmap = QPixmap('pictures/hot_cappuccino.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # capp_img.setPixmap(capp_pixmap)
-
-        # # 카푸치노 가격 추가
-        # self.capp_price = 5000
-        # capp_price_label = QLabel(f'{self.capp_price}원', self)
-
-        # # 카푸치노 개수 선택
-        # self.capp_spinbox = QSpinBox(self)
-        # self.capp_spinbox.setMinimum(0)
-        # self.capp_spinbox.setMaximum(20)
-        # self.capp_spinbox.valueChanged.connect(self.update_total_price)
-
-        # # 카푸치노 버튼 추가
-        # btn3 = QPushButton('카푸치노', self)
-        # btn3.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn3.clicked.connect(self.cappuccino)
-
-        # # 카라멜마끼야또 이미지 추가
-        # caramel_img = QLabel(self)
-        # caramel_pixmap = QPixmap('pictures/hot_caramelMacchiato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # caramel_img.setPixmap(caramel_pixmap)
-
-        # # 카라멜마끼야또 가격 추가
-        # self.caramel_price = 4500
-        # caramel_price_label = QLabel(f'{self.caramel_price}원', self)
-
-        # # 카라멜마끼야또 개수 선택
-        # self.caramel_spinbox = QSpinBox(self)
-        # self.caramel_spinbox.setMinimum(0)
-        # self.caramel_spinbox.setMaximum(20)
-        # self.caramel_spinbox.valueChanged.connect(self.update_total_price)
-        # # 카라멜마끼야또 버튼 추가
-        # btn4 = QPushButton('카라멜마끼야또', self)
-        # btn4.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn4.clicked.connect(self.caramel)
-
-        # # 콜드블루 이미지 추가
-        # cb_img = QLabel(self)
-        # cb_pixmap = QPixmap('pictures/ice_coldbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # cb_img.setPixmap(cb_pixmap)
-
-        # # 콜드블루 가격 추가
-        # self.cb_price = 4500
-        # cb_price_label = QLabel(f'{self.cb_price}원', self)
-
-        # # 콜드블루 개수 선택
-        # self.cb_spinbox = QSpinBox(self)
-        # self.cb_spinbox.setMinimum(0)
-        # self.cb_spinbox.setMaximum(20)
-        # self.cb_spinbox.valueChanged.connect(self.update_total_price)
-
-        # # 콜드블루 버튼 추가
-        # btn5 = QPushButton('콜드블루', self)
-        # btn5.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn5.clicked.connect(self.cb)
-
-        # # 돌체콜드블루 이미지 추가
-        # dcb_img = QLabel(self)
-        # dcb_pixmap = QPixmap('pictures/ice_dolceColdbrew.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # dcb_img.setPixmap(dcb_pixmap)
-
-        # # 돌체콜드블루 가격 추가
-        # self.dcb_price = 5000
-        # dcb_price_label = QLabel(f'{self.dcb_price}원', self)
-
-        # # 돌체콜드블루 개수 선택
-        # self.dcb_spinbox = QSpinBox(self)
-        # self.dcb_spinbox.setMinimum(0)
-        # self.dcb_spinbox.setMaximum(20)
-        # self.dcb_spinbox.valueChanged.connect(self.update_total_price)
-
-        # # 돌체콜드블루 버튼 추가
-        # btn6 = QPushButton('돌체콜드블루', self)
-        # btn6.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn6.clicked.connect(self.dcb)
-
-        # # 바닐라 아포카토 이미지 추가
-        # vaff_img = QLabel(self)
-        # vaff_pixmap = QPixmap('pictures/ice_vanillaAffogato.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # vaff_img.setPixmap(vaff_pixmap)
-
-        # # 바닐라 아포카토 가격 추가
-        # self.vaff_price = 5000
-        # vaff_price_label = QLabel(f'{self.vaff_price}원', self)
-
-        # # 바닐라 아포카토 개수 선택
-        # self.vaff_spinbox = QSpinBox(self)
-        # self.vaff_spinbox.setMinimum(0)
-        # self.vaff_spinbox.setMaximum(20)
-        # self.vaff_spinbox.valueChanged.connect(self.update_total_price)
-
-        # # 바닐라 아포카토 버튼 추가
-        # btn7 = QPushButton('바닐라 아포카토', self)
-        # btn7.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn7.clicked.connect(self.vaff)
-
-        # # 화이트 초콜릿 모카 이미지 추가
-        # wcm_img = QLabel(self)
-        # wcm_pixmap = QPixmap('pictures/ice_whiteChocolateMocha.jpg').scaled(200, 200, Qt.KeepAspectRatio)
-        # wcm_img.setPixmap(wcm_pixmap)
-
-        # # 화이트 초콜릿 모카 가격 추가
-        # self.wcm_price = 4500
-        # wcm_price_label = QLabel(f'{self.wcm_price}원', self)
-
-        # # 화이트 초콜릿 모카 개수 선택
-        # self.wcm_spinbox = QSpinBox(self)
-        # self.wcm_spinbox.setMinimum(0)
-        # self.wcm_spinbox.setMaximum(20)
-        # self.wcm_spinbox.valueChanged.connect(self.update_total_price)
-
-        # # 화이트 초콜릿 모카 버튼 추가
-        # btn8 = QPushButton('화이트 초콜릿 모카', self)
-        # btn8.setStyleSheet("background-color: #A0522D; color: white;")
-        # btn8.clicked.connect(self.wcm)
 
         # Create a central widget
         central_widget = QWidget()
@@ -267,22 +112,29 @@ class CoffeeKiosk(QMainWindow):
             # Create QLabel for the price
             price_label = QLabel(f'{price}원', self)
 
-            # Create QSpinBox for quantity selection
-            spinbox = QSpinBox(self)
-            spinbox.setMinimum(0)
-            spinbox.setMaximum(20)
-            spinbox.valueChanged.connect(self.update_total_price)
+            # # Create QSpinBox for quantity selection
+            # spinbox = QSpinBox(self)
+            # spinbox.setMinimum(0)
+            # spinbox.setMaximum(20)
+            # spinbox.valueChanged.connect(self.update_total_price)
 
             # Create QPushButton for menu item
             btn = QPushButton(name, self)
             btn.setStyleSheet("background-color: #A0522D; color: white;")
-            btn.clicked.connect(self.menu_item_clicked)
+            btn.clicked.connect(lambda _, name=name: self.menu_item_clicked(name))
+
+            # Connect the click event of the image_label to menu_item_clicked
+            image_label.mousePressEvent = lambda _, name=name: self.menu_item_clicked(name)
 
             # Add the widgets to the layout
             layout.addWidget(image_label, index // 4 * 4, index % 4)
             layout.addWidget(price_label, index // 4 * 4 + 1, index % 4)
-            layout.addWidget(spinbox, index // 4 * 4 + 2, index % 4)
-            layout.addWidget(btn, index // 4 * 4 + 3, index % 4)
+            # layout.addWidget(spinbox, index // 4 * 4 + 2, index % 4)
+            layout.addWidget(btn, index // 4 * 4 + 2, index % 4)
+
+            # Limit the number of menu items to 12 (3 rows x 4 columns)
+            if index >= 11:
+                break
 
         # Set column and row stretch
         layout.setColumnStretch(0, 1)
@@ -291,334 +143,226 @@ class CoffeeKiosk(QMainWindow):
         # Close the database connection
         # conn.close()
 
-        # 구매 버튼 추가
-        buy_btn = QPushButton('구매', self)
-        buy_btn.setStyleSheet("background-color: #A0522D; color: white;")
-        buy_btn.clicked.connect(self.buy)
-
-        # 취소 버튼 추가
-        cancel_btn = QPushButton("취소", self)
-        cancel_btn.setStyleSheet("background-color: #A0522D; color: white;")
-        cancel_btn.clicked.connect(self.reset)
-
-        # 총 가격 레이블 추가
-        self.total_price_label = QLabel('총 가격: 0원', self)
-
-        # 주문 내역 테이블 추가
-        self.order_table = QTableWidget(self)
+        # Create a table for order items
+        self.order_table = QTableWidget()
         self.order_table.setColumnCount(4)
-        self.order_table.setHorizontalHeaderLabels(['메뉴', '수량', '가격', '취소'])
-        self.order_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.order_table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.order_table.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.order_table.cellClicked.connect(self.change_quantity)
-        self.order_table.setColumnWidth(0, 200)
-        self.order_table.setColumnWidth(1, 50)
-        self.order_table.setColumnWidth(2, 100)
-        self.order_table.setColumnWidth(3, 50)
+        self.order_table.setHorizontalHeaderLabels(["메뉴", "수량", "가격", "취소"])
+        self.order_table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.order_table.setSelectionBehavior(QTableWidget.SelectRows)
 
-        # # 음성 인식 버튼 추가
-        # voice_btn = QPushButton('음성 인식', self)
-        # voice_btn.setStyleSheet("background-color: #A0522D; color: white;")
-        # voice_btn.clicked.connect(self.voice_recognition)
+        # Create a layout for the order section
+        order_layout = QVBoxLayout()
 
-        
+        # Create QLabel for total price
+        self.total_price_label = QLabel()
 
-        # # 수직 박스 레이아웃에 위젯 추가
-        # widget = QWidget()
-        # vbox = QVBoxLayout(widget)
-        # vbox.setAlignment(Qt.AlignCenter)
-        # vbox.addWidget(am_img)
-        # vbox.addWidget(am_price_label)
-        # vbox.addWidget(self.am_spinbox)
-        # vbox.addWidget(btn1)
-        # widget1 = QWidget()
-        # widget1.setLayout(vbox)
-        # self.setCentralWidget(widget)
+        # Create QPushButton for purchase
+        purchase_button = QPushButton("구매")
+        purchase_button.setStyleSheet("background-color: #008000; color: white;")
+        # purchase_button.clicked.connect(self.purchase_items)
+        purchase_button.clicked.connect(self.show_purchase_confirmation)
+        order_layout.addWidget(purchase_button)
 
-        # vbox.addWidget(latte_img)
-        # vbox.addWidget(latte_price_label)
-        # vbox.addWidget(self.latte_spinbox)
-        # vbox.addWidget(btn2)
-        # widget2 = QWidget()
-        # widget2.setLayout(vbox)
-        # self.setCentralWidget(widget)
+        # Create QPushButton for cancel
+        cancel_button = QPushButton('취소', self)
+        cancel_button.setStyleSheet("background-color: #FF0000; color: white;")
+        cancel_button.clicked.connect(self.cancel_clicked)
+        order_layout.addWidget(cancel_button)
 
-        # vbox.addWidget(capp_img)
-        # vbox.addWidget(capp_price_label)
-        # vbox.addWidget(self.capp_spinbox)
-        # vbox.addWidget(btn3)
-        # widget3 = QWidget()
-        # widget3.setLayout(vbox)
-        # self.setCentralWidget(widget)
+        # Add the order_layout to the main layout
+        layout.addLayout(order_layout, (index // 4) * 4 + 4, 0, 1, 4)
 
-        # vbox.addWidget(caramel_img)
-        # vbox.addWidget(caramel_price_label)
-        # vbox.addWidget(self.caramel_spinbox)
-        # vbox.addWidget(btn4)
-        # widget4 = QWidget()
-        # widget4.setLayout(vbox)
-        # self.setCentralWidget(widget)
+        # Create a layout for the order table
+        order_table_layout = QVBoxLayout()
+        order_table_layout.addWidget(self.order_table)
 
-        # vbox.addWidget(cb_img)
-        # vbox.addWidget(cb_price_label)
-        # vbox.addWidget(self.cb_spinbox)
-        # vbox.addWidget(btn5)
-        # widget5 = QWidget()
-        # widget5.setLayout(vbox)
-        # self.setCentralWidget(widget)
+        # Add the order_table_layout to the main layout
+        layout.addLayout(order_table_layout, (index // 4) * 4 + 5, 0, 1, 4)
 
-        # vbox.addWidget(dcb_img)
-        # vbox.addWidget(dcb_price_label)
-        # vbox.addWidget(self.dcb_spinbox)
-        # vbox.addWidget(btn6)
-        # widget6 = QWidget()
-        # widget6.setLayout(vbox)
-        # self.setCentralWidget(widget)
+        # Create a QLabel for total price
+        self.total_price_label = QLabel()
+        layout.addWidget(self.total_price_label, (index // 4) * 4 + 5, 3, 1, 4)
 
-        # vbox.addWidget(vaff_img)
-        # vbox.addWidget(vaff_price_label)
-        # vbox.addWidget(self.vaff_spinbox)
-        # vbox.addWidget(btn7)
-        # widget7 = QWidget()
-        # widget7.setLayout(vbox)
-        # self.setCentralWidget(widget)
 
-        # vbox.addWidget(wcm_img)
-        # vbox.addWidget(wcm_price_label)
-        # vbox.addWidget(self.wcm_spinbox)
-        # vbox.addWidget(btn8)
-        # widget8 = QWidget()
-        # widget8.setLayout(vbox)
-        # self.setCentralWidget(widget)
-
-        # QGridLayout으로 레이아웃 변경
-        widget = QWidget()
-        grid = QGridLayout(widget)
-        # grid.setAlignment(Qt.AlignCenter)
-
-        # grid.addWidget(am_img, 0, 0)
-        # grid.addWidget(am_price_label, 1, 0)
-        # grid.addWidget(self.am_spinbox, 2, 0)
-        # grid.addWidget(btn1, 3, 0)
-
-        # grid.addWidget(latte_img, 0, 1)
-        # grid.addWidget(latte_price_label, 1, 1)
-        # grid.addWidget(self.latte_spinbox, 2, 1)
-        # grid.addWidget(btn2, 3, 1)
-
-        # grid.addWidget(capp_img, 0, 2)
-        # grid.addWidget(capp_price_label, 1, 2)
-        # grid.addWidget(self.capp_spinbox, 2, 2)
-        # grid.addWidget(btn3, 3, 2)
-
-        # grid.addWidget(caramel_img, 0, 3)
-        # grid.addWidget(caramel_price_label, 1, 3)
-        # grid.addWidget(self.caramel_spinbox, 2, 3)
-        # grid.addWidget(btn4, 3, 3)
-
-        # grid.addWidget(cb_img, 4, 0)
-        # grid.addWidget(cb_price_label, 5, 0)
-        # grid.addWidget(self.cb_spinbox, 6, 0)
-        # grid.addWidget(btn5, 7, 0)
-
-        # grid.addWidget(dcb_img, 4, 1)
-        # grid.addWidget(dcb_price_label, 5, 1)
-        # grid.addWidget(self.dcb_spinbox, 6, 1)
-        # grid.addWidget(btn6, 7, 1)
-
-        # grid.addWidget(vaff_img, 4, 2)
-        # grid.addWidget(vaff_price_label, 5, 2)
-        # grid.addWidget(self.vaff_spinbox, 6, 2)
-        # grid.addWidget(btn7, 7, 2)
-
-        # grid.addWidget(wcm_img, 4, 3)
-        # grid.addWidget(wcm_price_label, 5, 3)
-        # grid.addWidget(self.wcm_spinbox, 6, 3)
-        # grid.addWidget(btn8, 7, 3)
-
-        # self.setCentralWidget(widget)
-
-        grid.addWidget(self.order_table, 8, 0)
-        grid.addWidget(self.total_price_label, 8, 1, alignment=Qt.AlignRight)
-        grid.addWidget(buy_btn, 8, 2, alignment=Qt.AlignRight)
-        grid.addWidget(cancel_btn, 9, 2, alignment=Qt.AlignRight)
-        # grid.addWidget(voice_btn, 8, 3, alignment=Qt.AlignRight)
-        #self.setCentralWidget(widget)
-
-        
-        # self.setLayout(grid)
-
+        # Close the database connection
         self.show()
         conn.close()
 
-    def menu_item_clicked(self):
-        sender = self.sender()
-        item_name = sender.text()
+    def menu_item_clicked(self, name):
+        # Handle the menu item clicked event
+        # print(f"Menu item clicked: {name}")
+        
+         # Connect to the SQLite database
+        conn = sqlite3.connect('coffee.db')
+        cursor = conn.cursor()
 
-    def americano(self):
-        self.add_order('아메리카노', self.am_spinbox.value(), self.am_price)
+        # Check if the menu item already exists in the order table
+        for row in range(self.order_table.rowCount()):
+            item_name = self.order_table.item(row, 0).text()
+            if item_name == name:
+                return  # Skip adding the menu item if it already exists
 
-    def latte(self):
-        self.add_order('카페라떼', self.latte_spinbox.value(), self.latte_price)
+        # Fetch the price from the database based on the menu item name
+        cursor.execute("SELECT price FROM coffee WHERE name=?", (name,))
+        result = cursor.fetchone()
+        if result:
+            price = result[0]
 
-    def cappuccino(self):
-        self.add_order('카푸치노', self.capp_spinbox.value(), self.capp_price)
+            # Add the clicked menu item to the order table
+            row = self.order_table.rowCount()
+            self.order_table.insertRow(row)
+            self.order_table.setItem(row, 0, QTableWidgetItem(name))
 
-    def caramel(self):
-        self.add_order('카라멜마끼야또', self.caramel_spinbox.value(), self.caramel_price)
+            # Create QSpinBox for quantity selection
+            spinbox = QSpinBox(self)
+            spinbox.setMinimum(0)
+            spinbox.setMaximum(20)
+            spinbox.setValue(1)
+            spinbox.valueChanged.connect(lambda value, row=row, price=price: self.update_item_price(row, price, value))
+            self.order_table.setCellWidget(row, 1, spinbox)
 
-    def cb(self):
-        self.add_order('콜드블루', self.cb_spinbox.value(), self.cb_price)
+            # Calculate the total price for the initial quantity
+            total_price = price * spinbox.value()
+            self.order_table.setItem(row, 2, QTableWidgetItem(str(total_price)))
 
-    def dcb(self):
-        self.add_order('돌체콜드블루', self.dcb_spinbox.value(), self.dcb_price)
+            # Create QPushButton for cancel
+            cancel_button = QPushButton('취소', self)
+            cancel_button.setStyleSheet("background-color: #FF0000; color: white;")
+            cancel_button.clicked.connect(self.cancel_item_clicked)
+            self.order_table.setCellWidget(row, 3, cancel_button)
 
-    def vaff(self):
-        self.add_order('바닐라 아포카토', self.vaff_spinbox.value(), self.vaff_price)
+            self.update_total_price()
 
-    def wcm(self):
-        self.add_order('화이트 초콜릿 모카', self.wcm_spinbox.value(), self.wcm_price)
+        # Close the database connection
+        conn.close()
 
-    def add_order(self, coffee, quantity, price):
-        if quantity > 0:
-            for i in range(len(self.order_list)):
-                if self.order_list[i][0] == coffee:
-                    self.order_list[i][1] += quantity
-                    self.order_list[i][2] = self.order_list[i][1] * price
-                    self.update_order_table()
-                    return
-            self.order_list.append([coffee, quantity, quantity * price])
-            self.update_order_table()
-
-    def update_order_table(self):
-        self.order_table.setRowCount(len(self.order_list))
-        for i in range(len(self.order_list)):
-            menu_item = QTableWidgetItem(self.order_list[i][0])
-            quantity_item = QTableWidgetItem(str(self.order_list[i][1]))
-            price_item = QTableWidgetItem(str(self.order_list[i][2]))
-            cancel_btn = QPushButton('X')
-            cancel_btn.setStyleSheet("background-color: #A0522D; color: white;")
-            cancel_btn.clicked.connect(lambda _, row=i: self.cancel_order(row))
-            self.order_table.setItem(i, 0, menu_item)
-            self.order_table.setItem(i, 1, quantity_item)
-            self.order_table.setItem(i, 2, price_item)
-            self.order_table.setCellWidget(i, 3, cancel_btn)
+    def update_item_price(self, row, price, quantity):
+        total_price = price * quantity
+        self.order_table.setItem(row, 2, QTableWidgetItem(str(total_price)))
         self.update_total_price()
 
-    def change_quantity(self, row, column):
-        if column == 1:
-            quantity, ok = QInputDialog.getInt(self, '수량 변경', '수량을 입력하세요.', value=self.order_list[row][1], min=1, max=20)
-            if ok:
-                self.order_list[row][1] = quantity
-                self.order_list[row][2] = quantity * self.get_price(self.order_list[row][0])
-                self.update_order_table()
-
-    def cancel_order(self, row):
-        self.order_list.pop(row)
-        self.update_order_table()
-
-
-    def get_price(self, coffee):
-        if coffee == '아메리카노':
-            return self.am_price
-        elif coffee == '카페라떼':
-            return self.latte_price
-        elif coffee == '카푸치노':
-            return self.capp_price
-        elif coffee == '카라멜마끼야또':
-            return self.caramel_price
-        elif coffee == '콜드블루':
-            return self.cb_price
-        elif coffee == '돌체콜드블루':
-            return self.dcb_price
-        elif coffee == '바닐라 아포카토':
-            return self.vaff_price
-        elif coffee == '화이트 초콜릿 모카':
-            return self.wcm_price
-
-    def voice_recognition(self):
-        with sr.Microphone() as source:
-            self.recognizer.adjust_for_ambient_noise(source)
-            audio = self.recognizer.listen(source)
-
-        try:
-            query = self.recognizer.recognize_google(audio, language='ko-KR')
-            self.select_coffee(query)
-        except sr.UnknownValueError:
-            QMessageBox.warning(self, '음성 인식 실패', '음성 인식 결과가 없습니다.')
-
-    def select_coffee(self, query):
-        if '아메리카노' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('아메리카노', quantity, self.am_price)
-        elif '카페라떼' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('카페라떼', quantity, self.latte_price)
-        elif '카푸치노' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('카푸치노', quantity, self.capp_price)
-        elif '카라멜마끼야또' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('카라멜마끼야또', quantity, self.caramel_price)
-        elif '콜드블루' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('콜드블루', quantity, self.cb_price)
-        elif '돌체콜드블루' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('돌체콜드블루', quantity, self.dcb_price)
-        elif '바닐라 아포카토' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('바닐라 아포카토', quantity, self.vaff_price)
-        elif '화이트 초콜릿 모카' in query:
-            quantity = self.get_quantity(query)
-            self.add_order('화이트 초콜릿 모카', quantity, self.wcm_price)
-
-        else:
-            QMessageBox.warning(self, '음성 인식 실패', '음성 인식 결과에 해당하는 커피가 없습니다.')
-
-    def get_quantity(self, query):
-        words = query.split()
-        for i in range(len(words)):
-            if words[i].isdigit():
-                return int(words[i])
-        return 1
+    def cancel_item_clicked(self):
+        # Handle the cancel item clicked event
+        button = self.sender()
+        if button:
+            row = self.order_table.indexAt(button.pos()).row()
+            self.order_table.removeRow(row)
+            self.update_total_price()
 
     def update_total_price(self):
-        total_price = sum([order[2] for order in self.order_list])
+        total_price = sum(int(self.order_table.item(row, 2).text()) for row in range(self.order_table.rowCount()))
         self.total_price_label.setText(f'총 가격: {total_price}원')
 
-    def buy(self):
-        if not self.order_list:
-            QMessageBox.warning(self, '주문 실패', '커피를 선택해주세요.')
 
-        else:
-            msg_box = QMessageBox()
-            msg_box.setIcon(QMessageBox.Question)
-            msg_box.setText('주문하시겠습니까?')
-            msg_box.setWindowTitle('주문 확인')
-            msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            result = msg_box.exec_()
-            if result == QMessageBox.Yes:
-                QMessageBox.information(self, '주문 완료', '주문이 완료되었습니다.')
-                self.order_list = []
-                self.update_order_table()
-                self.update_total_price()
-            else:
-                return
-            
-    def reset(self):
-        self.am_spinbox.setValue(0)
-        self.latte_spinbox.setValue(0)
-        self.capp_spinbox.setValue(0)
-        self.caramel_spinbox.setValue(0)
-        self.cb_spinbox.setValue(0)
-        self.dcb_spinbox.setValue(0)
-        self.vaff_spinbox.setValue(0)
-        self.wcm_spinbox.setValue(0)
+
+    def purchase_clicked(self):
+        # Handle the purchase button clicked event
+        total_price = 0
+        for row in range(self.order_table.rowCount()):
+            price_item = self.order_table.item(row, 2)
+            if price_item:
+                price = int(price_item.text())
+                total_price += price
+        print(f"Total Price: {total_price}")
+
+    def cancel_clicked(self):
+        # Handle the cancel button clicked event
+        self.order_table.clearContents()
         self.order_table.setRowCount(0)
-        self.total_price_label.setText("총 가격: 0원")
+
+    def purchase_items(self):
+        # Perform the purchase logic here
+        print("Purchase items")
+
+        # Clear the order table and update the total price
+        self.order_table.clearContents()
+        self.update_total_price()
     
+    def show_purchase_confirmation(self):
+
+        conn = sqlite3.connect('purchaseLog.db')
+        cursor = conn.cursor()
+
+        # Create a new window for purchase confirmation
+        self.purchase_dialog = QDialog(self)
+        self.purchase_dialog.setWindowTitle("구매 확인")
+
+        # Get the coffee names and quantities from the order_table
+        purchase_info = []
+        for row in range(self.order_table.rowCount()):
+            coffee_name = self.order_table.item(row, 0).text()
+            quantity = self.order_table.cellWidget(row, 1).value()
+            purchase_info.append(coffee_name + " (수량: " + str(quantity) + ")")
+
+        # Create QLabel for purchase information
+        purchase_info_label = QLabel()
+        purchase_info_label.setText("구매 정보: " + "\n".join(purchase_info))
+        purchase_info_label.setStyleSheet("font-size: 14pt")  # Adjust the font size as desired
+
+        # Update the total price
+        self.update_total_price()
+
+        # Create QLabel for total price
+        total_price_label = QLabel()
+        total_price_label.setText(self.total_price_label.text())
+        total_price_label.setStyleSheet("font-size: 14pt")  # Adjust the font size as desired
+
+        # Create QPushButton for purchase confirmation
+        confirm_button = QPushButton("구매 확정")
+        confirm_button.clicked.connect(self.confirm_purchase)
+
+        # Create QVBoxLayout for the purchase confirmation window
+        layout = QVBoxLayout()
+        layout.addWidget(purchase_info_label)
+        layout.addWidget(total_price_label)
+        layout.addWidget(confirm_button)
+
+        # Set the layout for the purchase dialog
+        self.purchase_dialog.setLayout(layout)
+
+        # Get the current date and time
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Iterate over the rows in the order table
+        for row in range(self.order_table.rowCount()):
+            # Get the coffee name, quantity, and price from the table
+            coffee_name = self.order_table.item(row, 0).text()
+            quantity = self.order_table.cellWidget(row, 1).value()
+            price = self.order_table.item(row, 2).text()
+
+            # Calculate the total price
+            total_price = int(price)
+
+            # Insert the purchase information into the purchaseLog table
+            cursor.execute("INSERT INTO purchaseLog (purchase_date, coffee_name, quantity, total_price) VALUES (?, ?, ?, ?)",
+                        (current_time, coffee_name, quantity, total_price))
+
+        # Commit the changes to the database
+        conn.commit()
+        # Close the database connection
+        conn.close()
+
+        # Show the purchase confirmation dialog
+        self.purchase_dialog.exec_()
+    
+    def confirm_purchase(self):
+        # Close the purchase dialog
+        self.purchase_dialog.close()
+
+        # Clear the order table
+        self.order_table.clearContents()
+        self.order_table.setRowCount(0)
+
+        # Reset the total price label
+        self.total_price_label.setText("총 가격: 0 원")
+
+        # Show the main window again
+        self.show()
+
+    def close_purchase_window(self):
+        if hasattr(self, 'purchase_window'):
+            self.purchase_window.close()
+
     def show_admin_login(self):
         dialog = AdminLoginDialog()
         dialog.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.ImhNoAutoUppercase)
@@ -648,14 +392,8 @@ class CoffeeKiosk(QMainWindow):
             self.new_window.close()
         event.accept()
 
-    
 # 메인 애플리케이션 실행
 app = QApplication([])
 window = CoffeeKiosk()
 # window.show_admin_login()
 app.exec_()
-
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     window = CoffeeKiosk()
-#     sys.exit(app.exec_())
